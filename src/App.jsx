@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css'
-import resultbox from './Components/ResultBox';
+import ResultBox from './Components/Resultbox';
 
 const centerStyle = {
   display: 'flex',
@@ -26,7 +26,7 @@ function App() {
       // query
       {
         name: "John Doe",
-        description: "A person who is a person",
+        description: "A person who is a person " + query,
       }
     ];
     setSearchResults(results);
@@ -67,10 +67,15 @@ function App() {
           <pre>{JSON.stringify(filters, null, 2)}</pre>
         </div>
         <div className="search-results">
-          {searchResults.map((result, index) => (
+          {/* {searchResults.map((result, index) => (
             <div key={index}>{result}</div>
 
-          ))}
+          ))} */}
+          {
+            searchResults.map((result, index) => (
+              <ResultBox key={index} person={result} />
+            ))
+          }
         </div>
       </div>
     </div>
