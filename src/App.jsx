@@ -7,6 +7,8 @@ const centerStyle = {
   alignItems: 'center',
 };
 
+{/* TODO - Update page when search button is clicked */}
+
 function App() {
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState({});
@@ -23,7 +25,7 @@ function App() {
     console.log('Search Query:', query);
     console.log('Filters:', filters);
     const results = [
-      // query
+      // TODO - replace this with a real API call based on filters
       {
         name: "John Doe",
         description: "A person who is a person " + query,
@@ -38,8 +40,10 @@ function App() {
     }
   };
 
+  {/* TODO - Improve overall page style */}
   return (
     <div>
+      {/* TODO - Create real name */}
       <h1>Epic People Search 69</h1>
       <div className="search-bar-container">
         <div className="search-bar" style={centerStyle}>
@@ -53,6 +57,7 @@ function App() {
           <button className="search-button" onClick={handleSearch}>Search</button>
         </div>
       </div>
+      {/* TODO - Create real filters and update button states based on value */}
       <div className="filter-buttons">
         <button onClick={() => handleFilterClick('filter1')} className="filter-button">
           Filter 1
@@ -67,10 +72,6 @@ function App() {
           <pre>{JSON.stringify(filters, null, 2)}</pre>
         </div>
         <div className="search-results">
-          {/* {searchResults.map((result, index) => (
-            <div key={index}>{result}</div>
-
-          ))} */}
           {
             searchResults.map((result, index) => (
               <ResultBox key={index} person={result} />
