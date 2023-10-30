@@ -26,9 +26,17 @@ function App() {
     console.log('Filters:', filters);
     const results = [
       // TODO - replace this with a real API call based on filters
+
+      // const response = await fetch(`/api/search?query=${query}`);
+      // const results = await response.json();
+
       {
         name: "John Doe",
         description: "A person who is a person " + query,
+      },
+      {
+        name: "Jane Doe",
+        description: "A person2 who is a person2 " + query,
       }
     ];
     setSearchResults(results);
