@@ -21,15 +21,15 @@ function App() {
     }));
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log('Search Query:', query);
     console.log('Filters:', filters);
+    // TODO - replace this with a real API call based on filters
+
+    // const response = await fetch(`/api/search?query=${query}`);
+    // const results = await response.json();
+
     const results = [
-      // TODO - replace this with a real API call based on filters
-
-      // const response = await fetch(`/api/search?query=${query}`);
-      // const results = await response.json();
-
       {
         name: "John Doe",
         description: "A person who is a person " + query,
@@ -50,7 +50,7 @@ function App() {
 
   {/* TODO - Improve overall page style */}
   return (
-    <div>
+    <div className="search-contents">
       {/* TODO - Create real name */}
       <h1>Epic People Search 69</h1>
       <div className="search-bar-container">

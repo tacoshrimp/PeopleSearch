@@ -1,4 +1,5 @@
 import React from 'react';
+import "./Resultbox.css"
 
 
 // TODO - fix the box shape and style
