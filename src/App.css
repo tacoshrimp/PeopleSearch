@@ -1,4 +1,19 @@
-#root {
+.App {
+  background-color: #eee;
+
+}
+
+.search-contents {
+  padding-top: 20vh;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 200px;
+}
+
+/* #root {
   max-width: 1920px;
   margin: 0 auto;
   padding: 2rem;
@@ -25,4 +40,4 @@
 
 .search-contents {
   
-}
+} */

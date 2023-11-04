@@ -1,90 +1,162 @@
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import './App.css'
 import ResultBox from './Components/Resultbox';
+import SearchBar from './Components/SearchBar';
+import MultiLine from './Components/MultiLine';
 
-const centerStyle = {
-  display: 'flex',
-  alignItems: 'center',
-};
+import axios from 'axios';
 
-{/* TODO - Update page when search button is clicked */}
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 function App() {
+
+  
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState({});
   const [searchResults, setSearchResults] = useState([]);
-
-  const handleFilterClick = (filterName) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterName]: !prevFilters[filterName],
-    }));
+  
+  
+  const [searchBy, setSearchBy] = useState("default");
+  const [checked, setChecked] = useState(false);
+  
+  const handleSearchBy = (event) => {
+    setSearchBy(event.target.value);
+  };
+  
+  const handleCheckbox = (event) => {
+    setChecked(event.target.checked);
   };
 
-  const handleSearch = async () => {
+  const sendToMain = (data) => {
+    // TODO Fix dates
+    console.log(data);
+  };
+  
+  const serverLink = "https://597d-185-84-106-204.ngrok-free.app";
+  let linkSuffix = "";
+
+  const handleSearch = (query) => {
     console.log('Search Query:', query);
     console.log('Filters:', filters);
-    // TODO - replace this with a real API call based on filters
 
-    // const response = await fetch(`/api/search?query=${query}`);
-    // const results = await response.json();
-
-    const results = [
-      {
-        name: "John Doe",
-        description: "A person who is a person " + query,
-      },
-      {
-        name: "Jane Doe",
-        description: "A person2 who is a person2 " + query,
+    if(!checked) {
+      switch(searchBy) {
+        case "default":
+          linkSuffix = `/search/all?q=${query}`;
+          break;
+        case "name":
+          linkSuffix = `/search?name=${query}`;
+          break;
+        case "dob":
+          linkSuffix = `/search?dob=${query}`;
+          break;
+        case "occupation":
+          linkSuffix = `/search?occupation=${query}`;
+          break;
+        default:
+          console.log("Invalid searchBy value");
+          break;
       }
-    ];
-    setSearchResults(results);
+    } else {
+      query = callGPT(query);
+      linkSuffix = `/search/all?q=${query}`;
+    }
+
+    fetchData(query);
   };
 
-  const handleEnterPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+  const callGPT = (query) => {
+    // TODO - Call GPT API
+    
+    query = "engineer";
+
+    return query;
+  }
+  
+  const fetchData = (query) => {
+      const axiosConfig = {
+        headers: {
+          'ngrok-skip-browser-warning': 'koosa'
+        }
+      };
+
+
+
+      axios.get(`${serverLink + linkSuffix}`, axiosConfig)
+      .then((response) => {
+        if (response.status === 200) {
+          console.log('JSON Response:');
+          console.log(response.data);
+          setSearchResults(response.data);
+        } else {
+          console.error('Request failed with status code: ' + response.status);
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }
+
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // TODO - Send file to server
+        console.log('Selected .docx file:', file);
+      } else {
+        alert('Please select a .docx file.');
+      }
     }
   };
 
   {/* TODO - Improve overall page style */}
   return (
-    <div className="search-contents">
-      {/* TODO - Create real name */}
-      <h1>Epic People Search 69</h1>
-      <div className="search-bar-container">
-        <div className="search-bar" style={centerStyle}>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleEnterPress}
-          />
-          <button className="search-button" onClick={handleSearch}>Search</button>
-        </div>
-      </div>
-      {/* TODO - Create real filters and update button states based on value */}
-      <div className="filter-buttons">
-        <button onClick={() => handleFilterClick('filter1')} className="filter-button">
-          Filter 1
-        </button>
-        <button onClick={() => handleFilterClick('filter2')} className="filter-button">
-          Filter 2
-        </button>
-      </div>
-      <div className="results">
+    <div className="App">
+      <div className="search-contents">
+        <h1>Epic People Search 69</h1>
+        {searchBy === "multiline" ? <MultiLine sendToMain={sendToMain} /> : <SearchBar handleSearch={handleSearch} />}
+
         <div>
-          <h3>Filters:</h3>
-          <pre>{JSON.stringify(filters, null, 2)}</pre>
+          <FormControl variant="outlined" style={{ width: '150px' }}>
+            <InputLabel id="page-select-label">Search by Filter</InputLabel>
+            <Select
+              labelId="page-select-label"
+              id="page-select"
+              value={searchBy}
+              onChange={handleSearchBy}
+              label="Search by Filter"
+            >
+              <MenuItem value={"default"}>All</MenuItem>
+              <MenuItem value={"name"}>Name</MenuItem>
+              <MenuItem value={"dob"}>Date of Birth</MenuItem>
+              <MenuItem value={"occupation"}>Occupation</MenuItem>
+              <MenuItem value={"multiline"}>Multi-Line</MenuItem>
+            </Select>
+          </FormControl>
         </div>
-        <div className="search-results">
-          {
-            searchResults.map((result, index) => (
-              <ResultBox key={index} person={result} />
-            ))
-          }
+
+        <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checked}
+                onChange={handleCheckbox}
+              />
+            }
+            label={"Use AI Query Reformatting"}
+          />
+        </div>
+
+        <div className="results">
+          <div className="search-results">
+            {
+              searchResults.map((result, index) => (
+                <ResultBox key={index} person={result} />
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>
