@@ -13,32 +13,3 @@
   align-items: center;
   min-width: 200px;
 }
-
-/* #root {
-  max-width: 1920px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.search-button {
-  margin-left: 10px; 
-}
-
-.filter-buttons {
-  margin: 10px;
-  padding-right: 10px;
-}
-
-.filter-button {
-  margin: 5px;
-}
-
-.search-bar-container {
-  display: flex;
-  justify-content: center;
-}
-
-.search-contents {
-  
-} */

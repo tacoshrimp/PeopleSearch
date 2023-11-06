@@ -3,6 +3,7 @@ import './App.css'
 import ResultBox from './Components/Resultbox';
 import SearchBar from './Components/SearchBar';
 import MultiLine from './Components/MultiLine';
+import DoBSlider from './Components/DoBSlider';
 
 import axios from 'axios';
 
@@ -10,8 +11,6 @@ import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
 function App() {
-
-  
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState({});
   const [searchResults, setSearchResults] = useState([]);
@@ -25,20 +24,47 @@ function App() {
   };
   
   const handleCheckbox = (event) => {
-    setChecked(event.target.checked);
+      
   };
 
   const sendToMain = (data) => {
-    // TODO Fix dates
     console.log(data);
+
+    let minDob = new Date(data[7][0], 1, 1);
+    let maxDob = new Date(data[7][1], 1, 1);
+
+    data.pop();
+
+    let result = {};
+
+    for (const variable of data) {
+      const key = variable.charAt(0).toUpperCase() + variable.slice(1);
+
+      if (window[variable] !== null) {
+        result[key] = window[variable];
+      }
+    }
+
+    handleSearch(result);
+  };
+  
+  const sendDobToMain = (data) => {
+    let minDob = new Date(data[0], 1, 1);
+    let maxDob = new Date(data[1], 1, 1);
+
+    handleSearch("test");
   };
   
   const serverLink = "https://597d-185-84-106-204.ngrok-free.app";
   let linkSuffix = "";
 
   const handleSearch = (query) => {
+    // TODO - Add new filter logic
+
     console.log('Search Query:', query);
     console.log('Filters:', filters);
+
+
 
     if(!checked) {
       switch(searchBy) {
@@ -49,21 +75,26 @@ function App() {
           linkSuffix = `/search?name=${query}`;
           break;
         case "dob":
-          linkSuffix = `/search?dob=${query}`;
+          linkSuffix = `/search?mindate=${minDob}&maxdate=${maxDob}`;
           break;
         case "occupation":
           linkSuffix = `/search?occupation=${query}`;
+          break;
+        case "multiline":
+          // TODO - Fix multiline search
+          linkSuffix = `/search?multiline`;
           break;
         default:
           console.log("Invalid searchBy value");
           break;
       }
     } else {
+      // TODO - Discuss GPT query call
       query = callGPT(query);
       linkSuffix = `/search/all?q=${query}`;
     }
 
-    fetchData(query);
+    fetchData();
   };
 
   const callGPT = (query) => {
@@ -74,14 +105,17 @@ function App() {
     return query;
   }
   
-  const fetchData = (query) => {
+  const fetchData = () => {
       const axiosConfig = {
         headers: {
           'ngrok-skip-browser-warning': 'koosa'
         }
       };
 
-
+      if(searchBy === "multiline") {
+        // TODO - Discuss POST request for multiline search
+        let test = 0;
+      }
 
       axios.get(`${serverLink + linkSuffix}`, axiosConfig)
       .then((response) => {
@@ -116,7 +150,7 @@ function App() {
     <div className="App">
       <div className="search-contents">
         <h1>Epic People Search 69</h1>
-        {searchBy === "multiline" ? <MultiLine sendToMain={sendToMain} /> : <SearchBar handleSearch={handleSearch} />}
+        {searchBy === "multiline" ? <MultiLine sendToMain={sendToMain} /> : searchBy === "dob" ? <DoBSlider sendDobToMain={sendDobToMain}/> : <SearchBar handleSearch={handleSearch} />}
 
         <div>
           <FormControl variant="outlined" style={{ width: '150px' }}>

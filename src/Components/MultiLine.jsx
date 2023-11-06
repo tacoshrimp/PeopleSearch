@@ -17,12 +17,12 @@ function MultiLine({ sendToMain }) {
 
     const marks = [
         {
-          value: 1900,
-          label: '1900',
+            value: 1900,
+            label: '1900',
         },
         {
-          value: 2023,
-          label: '2023',
+            value: 2023,
+            label: '2023',
         },
     ];
 
@@ -44,9 +44,8 @@ function MultiLine({ sendToMain }) {
         console.log("Description:", description);
         console.log("Likes:", likes);
         console.log("Interests:", interests);
-        console.log("Date of Birth:", dob[0]);
+        console.log("Date of Birth:", dob);
 
-        // Create a list to store all data
         let data = [
             name,
             age,
