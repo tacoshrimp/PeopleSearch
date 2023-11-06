@@ -54,8 +54,10 @@ function App() {
 
     handleSearch("test");
   };
+
+  const GPTAPI_key = process.env.GPT_API_KEY;
   
-  const serverLink = "https://597d-185-84-106-204.ngrok-free.app";
+  const serverLink = process.env.SERVER_LINK;
   let linkSuffix = "";
 
   const handleSearch = (query) => {
