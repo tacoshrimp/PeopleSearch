@@ -13,27 +13,7 @@ function MultiLine({ sendToMain }) {
     const [interests, setInterests] = useState("");
     const [gender, setGender] = useState("");
     const [age, setAge] = useState("");
-    const [dob, setDob] = useState([1900, 2023]);
-
-    const marks = [
-        {
-            value: 1900,
-            label: '1900',
-        },
-        {
-            value: 2023,
-            label: '2023',
-        },
-    ];
-
-    const handleSliderChange = (event, newValue) => {
-        setDob(newValue);
-    };
       
-    function valuetext(value) {
-        return `${value}`;
-    }
-
     const handleSubmit = () => {
 
         console.log("Form submitted with values:");
@@ -44,7 +24,6 @@ function MultiLine({ sendToMain }) {
         console.log("Description:", description);
         console.log("Likes:", likes);
         console.log("Interests:", interests);
-        console.log("Date of Birth:", dob);
 
         let data = [
             name,
@@ -54,7 +33,6 @@ function MultiLine({ sendToMain }) {
             description,
             likes,
             interests,
-            dob
         ];
 
         sendToMain(data);
@@ -96,22 +74,6 @@ function MultiLine({ sendToMain }) {
                 <p style={{ margin: 'auto',  display: "flex", justifyContent: "center", paddingTop: 10 }}>
                     Date of Birth
                 </p>
-                <Box sx={{ width: 300 }}>
-                    <Slider
-                        defaultValue={0}
-                        value={dob}
-                        onChange={handleSliderChange}
-                        getAriaValueText={valuetext}
-                        marks={marks}
-                        valueLabelDisplay="auto"
-                        min={1900}
-                        max={2023}
-                        disableSwap
-                        sx={{ 
-                            color: "#619cfa",
-                        }}
-                    />
-                </Box>
                 <TextField
                     label="Occupation"
                     variant="outlined"

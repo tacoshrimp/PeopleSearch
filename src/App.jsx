@@ -9,14 +9,29 @@ import axios from 'axios';
 
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { Checkbox, FormControlLabel } from "@mui/material";
+import Button from '@mui/material/Button';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 function App() {
+  const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   
   
   const [searchBy, setSearchBy] = useState("default");
   const [checked, setChecked] = useState(false);
-  const [scoreMode, setScoreMode] = useState("tfidf");
+  const [isFileSelected, setIsFileSelected] = useState(false);
+  const [scoreMode, setScoreMode] = useState("bm25");
+
+  const [selectedFile, setSelectedFile] = useState();
+
+  let minDob = new Date(1900, 1, 1);
+  let maxDob = new Date(2023, 1, 1);
+
+  const axiosConfig = {
+    headers: {
+      'ngrok-skip-browser-warning': 'koosa'
+    }
+  };
   
   const handleSearchBy = (event) => {
     setSearchBy(event.target.value);
@@ -33,27 +48,30 @@ function App() {
   const sendToMain = (data) => {
     console.log(data);
 
-    let minDob = new Date(data[7][0], 1, 1);
-    let maxDob = new Date(data[7][1], 1, 1);
-
-    data.pop();
-
     let result = {};
 
-    for (const variable of data) {
-      const key = variable.charAt(0).toUpperCase() + variable.slice(1);
+    // for (const variable of data) {
+    //   const key = variable.charAt(0).toUpperCase() + variable.slice(1);
 
-      if (window[variable] !== null) {
-        result[key] = window[variable];
-      }
-    }
+    //   if (window[variable] !== null) {
+    //     result[key] = window[variable];
+    //   }
+    // }
+    result = {
+      Name: "Ali",
+      Gender: "Male"
+    };
 
+    console.log(result);
     handleSearch(result);
   };
   
   const sendDobToMain = (data) => {
-    let minDob = new Date(data[0], 1, 1);
-    let maxDob = new Date(data[1], 1, 1);
+    minDob = new Date(data[0], 1, 1);
+    maxDob = new Date(data[1], 1, 1);
+    
+    minDob = minDob.getFullYear() + "-0" + (minDob.getMonth() ) + "-0" + minDob.getDate();
+    maxDob = maxDob.getFullYear() + "-0" + (maxDob.getMonth()) + "-0" + maxDob.getDate();
 
     handleSearch("test");
   };
@@ -73,19 +91,23 @@ function App() {
     if(!checked) {
       switch(searchBy) {
         case "default":
-          linkSuffix = `/search/all?q=${query}`;
+          if(scoreMode != "bm25") {
+            linkSuffix = `/search/${scoreMode}?q=${query}`;
+          } else {
+            linkSuffix = `/search/all?q=${query}`;
+          }
           break;
         case "name":
           linkSuffix = `/search?name=${query}`;
           break;
         case "dob":
-          linkSuffix = `/search?mindate=${minDob}&maxdate=${maxDob}`;
+          linkSuffix = `/search/dob?mindate=${minDob}&maxdate=${maxDob}`;
           break;
         case "occupation":
           linkSuffix = `/search?occupation=${query}`;
           break;
         case "multiline":
-          linkSuffix = `/search?multiline`;
+          linkSuffix = `/search/multiline`;
           break;
         default:
           console.log("Invalid searchBy value");
@@ -109,16 +131,10 @@ function App() {
   }
   
   const fetchData = () => {
-      const axiosConfig = {
-        headers: {
-          'ngrok-skip-browser-warning': 'koosa'
-        }
-      };
-
       if(searchBy === "multiline") {
         // TODO - Test multiline search
 
-        axios.post(`${serverLink + linkSuffix}`, result, axiosConfig)
+        axios.post(`${serverLink + linkSuffix}`, query, axiosConfig)
         .then((response) => {
           if (response.status === 200) {
             console.log('POST Response:');
@@ -148,18 +164,37 @@ function App() {
       }
   }
 
+  const handleFileChange = event => {
+    const file = event.target.files[0];
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
     if (file) {
       if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        // TODO - Send file to server
-        console.log('Selected .docx file:', file);
+        setSelectedFile(file);
+        setIsFileSelected(true);
+        console.log('Selected .docx file:', selectedFile);
       } else {
         alert('Please select a .docx file.');
       }
+    } else {
+      console.log("No file selected");
     }
   };
+
+  const handleUpload = async () => {
+    linkSuffix = `/upload`;
+
+    const formData = new FormData();
+
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await axios.post(`${serverLink + linkSuffix}`, formData, axiosConfig);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
 
   {/* TODO - Improve overall page style */}
   return (
@@ -167,6 +202,31 @@ function App() {
       <div className="search-contents">
         <h1>Epic People Search 69</h1>
         {searchBy === "multiline" ? <MultiLine sendToMain={sendToMain} /> : searchBy === "dob" ? <DoBSlider sendDobToMain={sendDobToMain}/> : <SearchBar handleSearch={handleSearch} />}
+
+
+        {isFileSelected ? <p>Selected File: {selectedFile.name}</p> : null}
+        <div style={{ paddingBottom: '25px', paddingTop: isFileSelected ? '10px': '0' }}>
+          <Button
+            variant="contained"
+            component="label"
+            startIcon={<CloudUploadIcon />}
+          >
+            Upload File
+            <input
+              type="file"
+              hidden
+              onChange={handleFileChange}
+            />
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleUpload}
+            style={{ marginLeft: '10px' }}
+          >
+            Send
+          </Button>
+        </div>
 
         <div>
           <FormControl variant="outlined" style={{ width: '150px' }}>
@@ -189,15 +249,15 @@ function App() {
 
         <div style={{ padding: '10px' }}>
           <FormControl variant="outlined" style={{ width: '150px' }}>
-            <InputLabel id="page-select-label">Score Mode</InputLabel>
+            <InputLabel id="page-select-label">Score Method</InputLabel>
             <Select
               labelId="page-select-label"
               id="page-select"
               value={scoreMode}
               onChange={handleScoreMode}
-              label="Score Mode"
+              label="Score Method"
             >
-              <MenuItem value={"tfidf"}>TF-IDF</MenuItem>
+              <MenuItem value={"bm25"}>BM25</MenuItem>
               <MenuItem value={"tf"}>TF Only</MenuItem>
               <MenuItem value={"idf"}>IDF Only</MenuItem>
             </Select>

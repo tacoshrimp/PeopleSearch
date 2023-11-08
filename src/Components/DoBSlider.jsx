@@ -4,7 +4,7 @@ import { TextField, FormControl, Select, MenuItem, Slider } from "@mui/material"
 import { Box } from "@mui/system";
 import Button from '@mui/material/Button';
 
-function DoBSlider({ sendDateToMain }) {
+function DoBSlider({ sendDobToMain }) {
     const [dob, setDob] = useState([1900, 2023]);
 
     const handleSliderChange = (event, newValue) => {
@@ -31,7 +31,7 @@ function DoBSlider({ sendDateToMain }) {
         console.log("Form submitted with values:");
         console.log("Date of Birth:", dob);
 
-        sendDateToMain(dob);
+        sendDobToMain(dob);
     };
 
     return (
