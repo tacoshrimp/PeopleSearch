@@ -18,13 +18,18 @@ function App() {
   
   const [searchBy, setSearchBy] = useState("default");
   const [checked, setChecked] = useState(false);
+  const [scoreMode, setScoreMode] = useState("tfidf");
   
   const handleSearchBy = (event) => {
     setSearchBy(event.target.value);
   };
+
+  const handleScoreMode = (event) => {
+    setScoreMode(event.target.value);
+  };
   
   const handleCheckbox = (event) => {
-      
+    setChecked(event.target.checked);
   };
 
   const sendToMain = (data) => {
@@ -173,6 +178,23 @@ function App() {
               <MenuItem value={"dob"}>Date of Birth</MenuItem>
               <MenuItem value={"occupation"}>Occupation</MenuItem>
               <MenuItem value={"multiline"}>Multi-Line</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+
+        <div style={{ padding: '10px' }}>
+          <FormControl variant="outlined" style={{ width: '150px' }}>
+            <InputLabel id="page-select-label">Score Mode</InputLabel>
+            <Select
+              labelId="page-select-label"
+              id="page-select"
+              value={scoreMode}
+              onChange={handleScoreMode}
+              label="Score Mode"
+            >
+              <MenuItem value={"tfidf"}>TF-IDF</MenuItem>
+              <MenuItem value={"tf"}>TF Only</MenuItem>
+              <MenuItem value={"idf"}>IDF Only</MenuItem>
             </Select>
           </FormControl>
         </div>
