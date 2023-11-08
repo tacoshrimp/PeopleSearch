@@ -26,6 +26,7 @@ function App() {
 
   let minDob = new Date(1900, 1, 1);
   let maxDob = new Date(2023, 1, 1);
+  let result = {};
 
   const axiosConfig = {
     headers: {
@@ -48,19 +49,29 @@ function App() {
   const sendToMain = (data) => {
     console.log(data);
 
-    let result = {};
+    result = {};
 
-    // for (const variable of data) {
-    //   const key = variable.charAt(0).toUpperCase() + variable.slice(1);
-
-    //   if (window[variable] !== null) {
-    //     result[key] = window[variable];
-    //   }
-    // }
-    result = {
-      Name: "Ali",
-      Gender: "Male"
-    };
+    if (data[0] !== "") {
+      result["Name"] = data[0];
+    }
+    if (data[1] !== "") {
+      result["Age"] = data[1];
+    }
+    if (data[2] !== "") {
+      result["Gender"] = data[2];
+    }
+    if (data[3] !== "") {
+      result["Occupation"] = data[3];
+    }
+    if (data[4] !== "") { 
+      result["Description"] = data[4];
+    }
+    if (data[5] !== "") {
+      result["Likes"] = data[5];
+    }
+    if (data[6] !== "") {
+      result["Interests"] = data[6];
+    }
 
     console.log(result);
     handleSearch(result);
@@ -86,8 +97,6 @@ function App() {
   let linkSuffix = "";
 
   const handleSearch = (query) => {
-    // TODO - Add new filter logic
-
     if(!checked) {
       switch(searchBy) {
         case "default":
@@ -114,7 +123,6 @@ function App() {
           break;
       }
     } else {
-      // TODO - Discuss GPT query call
       query = callGPT(query);
       linkSuffix = `/search/all?q=${query}`;
     }
@@ -132,9 +140,7 @@ function App() {
   
   const fetchData = () => {
       if(searchBy === "multiline") {
-        // TODO - Test multiline search
-
-        axios.post(`${serverLink + linkSuffix}`, query, axiosConfig)
+        axios.post(`${serverLink + linkSuffix}`, result, axiosConfig)
         .then((response) => {
           if (response.status === 200) {
             console.log('POST Response:');

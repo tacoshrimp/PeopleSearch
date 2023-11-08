@@ -71,9 +71,6 @@ function MultiLine({ sendToMain }) {
                     onChange={(e) => setAge(e.target.value)}
                     type="number"
                 />
-                <p style={{ margin: 'auto',  display: "flex", justifyContent: "center", paddingTop: 10 }}>
-                    Date of Birth
-                </p>
                 <TextField
                     label="Occupation"
                     variant="outlined"
@@ -107,7 +104,6 @@ function MultiLine({ sendToMain }) {
                         backgroundColor: "#61bafa",
                         color: "#eeeeee",
                     }
-                
                 }}>
                     Submit
                 </Button>
