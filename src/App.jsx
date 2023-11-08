@@ -55,9 +55,13 @@ function App() {
     handleSearch("test");
   };
 
-  const GPTAPI_key = process.env.GPT_API_KEY;
+  const GPTAPI_key = import.meta.env.VITE_GPT_API_KEY;
   
-  const serverLink = process.env.SERVER_LINK;
+  const serverLink = import.meta.env.VITE_SERVER_LINK;
+
+  console.log(GPTAPI_key);
+  console.log(serverLink);
+
   let linkSuffix = "";
 
   const handleSearch = (query) => {
