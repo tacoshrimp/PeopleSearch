@@ -11,8 +11,6 @@ import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
 function App() {
-  const [query, setQuery] = useState('');
-  const [filters, setFilters] = useState({});
   const [searchResults, setSearchResults] = useState([]);
   
   
@@ -72,11 +70,6 @@ function App() {
   const handleSearch = (query) => {
     // TODO - Add new filter logic
 
-    console.log('Search Query:', query);
-    console.log('Filters:', filters);
-
-
-
     if(!checked) {
       switch(searchBy) {
         case "default":
@@ -92,7 +85,6 @@ function App() {
           linkSuffix = `/search?occupation=${query}`;
           break;
         case "multiline":
-          // TODO - Fix multiline search
           linkSuffix = `/search?multiline`;
           break;
         default:
@@ -124,23 +116,36 @@ function App() {
       };
 
       if(searchBy === "multiline") {
-        // TODO - Discuss POST request for multiline search
-        let test = 0;
-      }
+        // TODO - Test multiline search
 
-      axios.get(`${serverLink + linkSuffix}`, axiosConfig)
-      .then((response) => {
-        if (response.status === 200) {
-          console.log('JSON Response:');
-          console.log(response.data);
-          setSearchResults(response.data);
-        } else {
-          console.error('Request failed with status code: ' + response.status);
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+        axios.post(`${serverLink + linkSuffix}`, result, axiosConfig)
+        .then((response) => {
+          if (response.status === 200) {
+            console.log('POST Response:');
+            console.log(response.data);
+            setSearchResults(response.data);
+          } else {
+            console.error('Request failed with status code: ' + response.status);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+      } else {
+        axios.get(`${serverLink + linkSuffix}`, axiosConfig)
+        .then((response) => {
+          if (response.status === 200) {
+            console.log('GET Response:');
+            console.log(response.data);
+            setSearchResults(response.data);
+          } else {
+            console.error('Request failed with status code: ' + response.status);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+      }
   }
 
 
