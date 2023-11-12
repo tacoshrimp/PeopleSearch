@@ -257,7 +257,7 @@ function App() {
   return (
     <div className="App">
       <div className="search-contents">
-        <h1>Epic People Search 69 🔥</h1>
+        <h1>Epic People Search 🔥</h1>
         {searchBy === "multiline" ? <MultiLine sendToMain={sendToMain} /> : searchBy === "dob" ? <DoBSlider sendDobToMain={sendDobToMain}/> : <SearchBar handleSearch={handleSearch} />}
 
 
