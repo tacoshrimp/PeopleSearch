@@ -6,6 +6,7 @@ import MultiLine from './Components/MultiLine';
 import DoBSlider from './Components/DoBSlider';
 
 import axios from 'axios';
+import OpenAI from 'openai';
 
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { Checkbox, FormControlLabel } from "@mui/material";
@@ -24,9 +25,12 @@ function App() {
 
   const [selectedFile, setSelectedFile] = useState();
 
+  const openai = new OpenAI({ apiKey: import.meta.env.VITE_GPT_API_KEY, dangerouslyAllowBrowser: true });
+
   let minDob = new Date(1900, 1, 1);
   let maxDob = new Date(2023, 1, 1);
   let result = {};
+  let completion = {};
 
   const axiosConfig = {
     headers: {
@@ -86,12 +90,9 @@ function App() {
 
     handleSearch("test");
   };
-
-  const GPTAPI_key = import.meta.env.VITE_GPT_API_KEY;
   
   const serverLink = import.meta.env.VITE_SERVER_LINK;
 
-  console.log(GPTAPI_key);
   console.log(serverLink);
 
   let linkSuffix = "";
@@ -124,21 +125,53 @@ function App() {
       }
     } else {
       query = callGPT(query);
-      linkSuffix = `/search/all?q=${query}`;
+
+      linkSuffix = `/search/multiline`;
     }
 
     fetchData();
   };
 
-  const callGPT = (query) => {
+  const callGPT = async (query) => {
     // TODO - Call GPT API
-    
-    query = "engineer";
 
+    const completion = await openai.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant designed to output JSON.",
+        },
+        { role: "user", content: query },
+      ],
+      model: "gpt-3.5-turbo-1106",
+      response_format: { type: "json_object" },
+    });
+    
+    console.log("Completion.choices[0].message.content " + completion.choices[0].message.content);
+    console.log("Completion.choices[0].message: " + completion.choices[0].message);
+    console.log("Completion.choices[0]: " + completion.choices[0]);
+    console.log("Completion: " + completion);
+    
     return query;
   }
   
   const fetchData = () => {
+    if(checked && searchBy === "default") {
+      // axios.post(`${serverLink + linkSuffix}`, completion.choices[0].message.content, axiosConfig)
+      //   .then((response) => {
+      //     if (response.status === 200) {
+      //       console.log('POST Response:');
+      //       console.log(response.data);
+      //       setSearchResults(response.data);
+      //     } else {
+      //       console.error('Request failed with status code: ' + response.status);
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     console.error('Error:', error);
+      //   });
+      console.log("Call MultiLine");
+    } else {
       if(searchBy === "multiline") {
         axios.post(`${serverLink + linkSuffix}`, result, axiosConfig)
         .then((response) => {
@@ -168,6 +201,7 @@ function App() {
           console.error('Error:', error);
         });
       }
+    }
   }
 
   const handleFileChange = event => {
@@ -206,7 +240,7 @@ function App() {
   return (
     <div className="App">
       <div className="search-contents">
-        <h1>Epic People Search 69</h1>
+        <h1>Epic People Search 69 🔥</h1>
         {searchBy === "multiline" ? <MultiLine sendToMain={sendToMain} /> : searchBy === "dob" ? <DoBSlider sendDobToMain={sendDobToMain}/> : <SearchBar handleSearch={handleSearch} />}
 
 
