@@ -321,7 +321,17 @@ function App() {
           </FormControl>
         </div>
 
-        { searchBy == "default" ? <div> <FormControlLabel control={ <Checkbox checked={checked} onChange={handleCheckbox}/>} label={"Use AI Query Reformatting"} /> </div> : <div></div> }
+        { searchBy == "default" ? <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checked}
+                onChange={handleCheckbox}
+              />
+            }
+              label={"Use AI Query Reformatting"}
+          />
+        </div> : <div></div>}
 
         <div className="results">
           <div className="search-results">
