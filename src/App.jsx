@@ -30,7 +30,6 @@ function App() {
   let minDob = new Date(1900, 1, 1);
   let maxDob = new Date(2023, 1, 1);
   let result = {};
-  let gptResponse = {};
   let gptResult = {};
 
   const axiosConfig = {
@@ -98,7 +97,7 @@ function App() {
 
   let linkSuffix = "";
 
-  const handleSearch = (query) => {
+  const handleSearch = async (query) => {
     if(!checked) {
       switch(searchBy) {
         case "default":
@@ -125,7 +124,7 @@ function App() {
           break;
       }
     } else {
-      query = callGPT(query);
+      query = await callGPT(query);
 
       linkSuffix = `/search/multiline`;
     }
@@ -134,58 +133,50 @@ function App() {
   };
 
   const callGPT = async (query) => {
-    completion = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: ```
-              You will be given a query. We would like to turn it into a JSON object that will be parsed by Node JS which will be your response. If your response is not in JSON format, the code will crash so you must always respond in this way and add nothing else.
-              The JSON object is allowed to have the following fields: Name, Age, Gender, Occupation, Description, Likes, Interests. The key will be these strings, and the value will depend on the query given.
-              You must fill in the blanks as you see fit. If a field does not exist in the query, include it as an empty string in the response. The current year is 2023. All values should be strings except age which should be an integer. Lists are not allowed. If a field seems like it can have more than one value, join the list into a string separated by spaces.
-            ```,
+          content: "You will be given a query. We would like to turn it into a JSON object that will be parsed by Node JS which will be your response. If your response is not in JSON format, the code will crash so you must always respond in this way and add nothing else. The JSON object is allowed to have the following fields: Name, Age, Gender, Occupation, Description, Likes, Interests. The key will be these strings, and the value will depend on the query given. You must fill in the blanks as you see fit. If a field does not exist in the query, include it as an empty string in the response. The current year is 2023. All values should be strings except age which should be an integer. Lists are not allowed. If a field seems like it can have more than one value, join the list into a string separated by spaces.",
         },
         { role: "user", content: query },
       ],
       model: "gpt-3.5-turbo-1106",
       response_format: { type: "json_object" },
     });
+
+    let gptResponse = JSON.parse(completion.choices[0].message.content);
     
-    console.log("Completion.choices[0].message.content " + completion.choices[0].message.content);
-    console.log("Completion.choices[0].message: " + completion.choices[0].message);
-    console.log("Completion.choices[0]: " + completion.choices[0]);
-    console.log("Completion: " + completion);
+    if (gptResponse["Name"] !== "") {
+      gptResult["Name"] = gptResponse["Name"];
+    }
+    if (gptResponse["Age"] !== "") {
+      gptResult["Age"] = gptResponse["Age"];
+    }
+    if (gptResponse["Gender"] !== "") {
+      gptResult["Gender"] = gptResponse["Gender"];
+    }
+    if (gptResponse["Occupation"] !== "") {
+      gptResult["Occupation"] = gptResponse["Occupation"];
+    }
+    if (gptResponse["Description"] !== "") { 
+      gptResult["Description"] = gptResponse["Description"];
+    }
+    if (gptResponse["Likes"] !== "") {
+      gptResult["Likes"] = gptResponse["Likes"];
+    }
+    if (gptResponse["Interests"] !== "") {
+      gptResult["Interests"] = gptResponse["Interests"];
+    }
 
-    gptResponse = JSON.parse(completion.choices[0].message.content);
+    console.log(JSON.stringify(gptResult));
 
-
-    if (gptResponse[0] !== "") {
-      gptResult["Name"] = gptResult[0];
-    }
-    if (gptResponse[1] !== "") {
-      gptResult["Age"] = gptResult[1];
-    }
-    if (gptResponse[2] !== "") {
-      gptResult["Gender"] = gptResult[2];
-    }
-    if (gptResponse[3] !== "") {
-      gptResult["Occupation"] = gptResult[3];
-    }
-    if (gptResponse[4] !== "") { 
-      gptResult["Description"] = gptResult[4];
-    }
-    if (gptResponse[5] !== "") {
-      gptResult["Likes"] = gptResult[5];
-    }
-    if (gptResponse[6] !== "") {
-      gptResult["Interests"] = gptResult[6];
-    }
-    
     return query;
   }
   
   const fetchData = () => {
     if(checked && searchBy === "default") {
-      axios.post(`${serverLink + linkSuffix}`, gptResponse, axiosConfig)
+      axios.post(`${serverLink + linkSuffix}`, gptResult, axiosConfig)
         .then((response) => {
           if (response.status === 200) {
             console.log('POST Response:');
@@ -198,10 +189,10 @@ function App() {
         .catch((error) => {
           console.error('Error:', error);
         });
-      console.log("Call MultiLine");
     } else {
+      console.log(typeof result);
       if(searchBy === "multiline") {
-        axios.post(`${serverLink + linkSuffix}`, gptResult, axiosConfig)
+        axios.post(`${serverLink + linkSuffix}`, result, axiosConfig)
         .then((response) => {
           if (response.status === 200) {
             console.log('POST Response:');

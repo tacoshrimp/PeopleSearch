@@ -13,6 +13,8 @@ function ResultBox({ person }) {
                     {person.DOB && <Typography variant="body1">{`DoB: ${person.DOB}`}</Typography>}
                     {person.Gender && <Typography variant="body1">{`Gender: ${person.Gender}`}</Typography>}
                     {person.Description && <Typography variant="body1">{`Description: ${person.Description}`}</Typography>}
+                    {person.Interests && <Typography variant="body1">{`Interests: ${person.Interests}`}</Typography>}
+                    {person.Likes && <Typography variant="body1">{`Likes: ${person.Likes}`}</Typography>}
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
                     <Typography variant="h4">{person.score}</Typography>
