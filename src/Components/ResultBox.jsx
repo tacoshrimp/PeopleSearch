@@ -1,5 +1,4 @@
 import React from 'react';
-import "./Resultbox.css"
 import { Card, CardContent, Typography, Box } from '@mui/material';
 
 
