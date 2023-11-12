@@ -30,7 +30,8 @@ function App() {
   let minDob = new Date(1900, 1, 1);
   let maxDob = new Date(2023, 1, 1);
   let result = {};
-  let completion = {};
+  let gptResponse = {};
+  let gptResult = {};
 
   const axiosConfig = {
     headers: {
@@ -133,13 +134,15 @@ function App() {
   };
 
   const callGPT = async (query) => {
-    // TODO - Call GPT API
-
-    const completion = await openai.chat.completions.create({
+    completion = await openai.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant designed to output JSON.",
+          content: ```
+              You will be given a query. We would like to turn it into a JSON object that will be parsed by Node JS which will be your response. If your response is not in JSON format, the code will crash so you must always respond in this way and add nothing else.
+              The JSON object is allowed to have the following fields: Name, Age, Gender, Occupation, Description, Likes, Interests. The key will be these strings, and the value will depend on the query given.
+              You must fill in the blanks as you see fit. If a field does not exist in the query, include it as an empty string in the response. The current year is 2023. All values should be strings except age which should be an integer. Lists are not allowed. If a field seems like it can have more than one value, join the list into a string separated by spaces.
+            ```,
         },
         { role: "user", content: query },
       ],
@@ -151,29 +154,54 @@ function App() {
     console.log("Completion.choices[0].message: " + completion.choices[0].message);
     console.log("Completion.choices[0]: " + completion.choices[0]);
     console.log("Completion: " + completion);
+
+    gptResponse = JSON.parse(completion.choices[0].message.content);
+
+
+    if (gptResponse[0] !== "") {
+      gptResult["Name"] = gptResult[0];
+    }
+    if (gptResponse[1] !== "") {
+      gptResult["Age"] = gptResult[1];
+    }
+    if (gptResponse[2] !== "") {
+      gptResult["Gender"] = gptResult[2];
+    }
+    if (gptResponse[3] !== "") {
+      gptResult["Occupation"] = gptResult[3];
+    }
+    if (gptResponse[4] !== "") { 
+      gptResult["Description"] = gptResult[4];
+    }
+    if (gptResponse[5] !== "") {
+      gptResult["Likes"] = gptResult[5];
+    }
+    if (gptResponse[6] !== "") {
+      gptResult["Interests"] = gptResult[6];
+    }
     
     return query;
   }
   
   const fetchData = () => {
     if(checked && searchBy === "default") {
-      // axios.post(`${serverLink + linkSuffix}`, completion.choices[0].message.content, axiosConfig)
-      //   .then((response) => {
-      //     if (response.status === 200) {
-      //       console.log('POST Response:');
-      //       console.log(response.data);
-      //       setSearchResults(response.data);
-      //     } else {
-      //       console.error('Request failed with status code: ' + response.status);
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error('Error:', error);
-      //   });
+      axios.post(`${serverLink + linkSuffix}`, gptResponse, axiosConfig)
+        .then((response) => {
+          if (response.status === 200) {
+            console.log('POST Response:');
+            console.log(response.data);
+            setSearchResults(response.data);
+          } else {
+            console.error('Request failed with status code: ' + response.status);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
       console.log("Call MultiLine");
     } else {
       if(searchBy === "multiline") {
-        axios.post(`${serverLink + linkSuffix}`, result, axiosConfig)
+        axios.post(`${serverLink + linkSuffix}`, gptResult, axiosConfig)
         .then((response) => {
           if (response.status === 200) {
             console.log('POST Response:');
@@ -235,8 +263,6 @@ function App() {
     }
   };
   
-
-  {/* TODO - Improve overall page style */}
   return (
     <div className="App">
       <div className="search-contents">

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 
-
-// TODO - fix the box shape and style
 function ResultBox({ person }) {
     return (
         <Card sx={{ marginTop: '10px', marginBottom: '20px' }}>
