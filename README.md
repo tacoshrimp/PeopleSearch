@@ -10,4 +10,5 @@ Currently, two official plugins are available:
 .env.development.local structure: 
 
 VITE_GPT_API_KEY=your-api-key
+
 VITE_SERVER_LINK=ServerLink (no slash at the end)
